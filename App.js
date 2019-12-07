@@ -1,6 +1,5 @@
-import React from "react";
+import React, { Component } from "react";
 import { createAppContainer } from "react-navigation";
-import { createMaterialBottomTabNavigator } from "react-navigation-material-bottom-tabs";
 import WelcomeScreen from "./screens/WelcomeScreen";
 import AuthScreen from "./screens/AuthScreen";
 import MapScreen from "./screens/MapScreen";
@@ -8,8 +7,20 @@ import DeckScreen from "./screens/DeckScreen";
 import ReviewScreen from "./screens/ReviewScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import { createStackNavigator } from "react-navigation-stack";
+import { createBottomTabNavigator } from "react-navigation-tabs";
 import { Provider } from "react-redux";
+import { ActivityIndicator, View, StyleSheet } from "react-native";
 import store from "./store";
+import * as Font from "expo-font";
+
+const removeTabBar = () => {
+  return {
+    defaultNavigationOptions: {
+      tabBarVisible: false
+    }
+  };
+};
+
 const stack = {
   review: {
     screen: createStackNavigator({
@@ -21,28 +32,65 @@ const stack = {
 
 const main = {
   main: {
-    screen: createMaterialBottomTabNavigator({
-      map: { screen: MapScreen },
-      deck: { screen: DeckScreen },
-      ...stack
-    })
+    screen: createBottomTabNavigator(
+      {
+        map: { screen: MapScreen },
+        deck: { screen: DeckScreen },
+        ...stack
+      },
+      removeTabBar()
+    )
   }
 };
 
-const mainNavigator = createMaterialBottomTabNavigator({
-  Welcome: { screen: WelcomeScreen },
-  Auth: { screen: AuthScreen },
-  ...main
-});
+const mainNavigator = createBottomTabNavigator(
+  {
+    Welcome: WelcomeScreen,
+    Auth: AuthScreen,
+    ...main
+  },
+  removeTabBar(),
+  {
+    lazy: true
+  }
+);
 
 const App = createAppContainer(mainNavigator);
 
-const MainApp = () => {
-  return (
-    <Provider store={store}>
-      <App />
-    </Provider>
-  );
-};
+export default class MainApp extends Component {
+  state = {
+    isLoading: false
+  };
+  componentDidMount() {
+    this._loadFontAsync();
+  }
 
-export default MainApp;
+  _loadFontAsync = async () => {
+    await Font.loadAsync({
+      monserrat: require("./assets/fonts/montserrat.ttf"),
+      monserratBold: require("./assets/fonts/Montserrat-Bold.ttf")
+    });
+    this.setState({ isLoading: true });
+  };
+
+  render() {
+    if (!this.state.isLoading) {
+      return (
+        <View style={styles.container}>
+          <ActivityIndicator size="large" color="#E56818" />
+        </View>
+      );
+    }
+    return (
+      <Provider store={store}>
+        <App />
+      </Provider>
+    );
+  }
+}
+const styles = StyleSheet.create({
+  container: {
+    justifyContent: "center",
+    flex: 1
+  }
+});
