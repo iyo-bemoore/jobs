@@ -1,0 +1,14 @@
+import { Dimensions } from "react-native";
+
+export const width = Dimensions.get("window").width;
+export const height = Dimensions.get("window").height;
+
+export const centerItems = () => {
+  return {
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center"
+    }
+  };
+};

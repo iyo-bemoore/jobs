@@ -32,14 +32,11 @@ const stack = {
 
 const main = {
   main: {
-    screen: createBottomTabNavigator(
-      {
-        map: { screen: MapScreen },
-        deck: { screen: DeckScreen },
-        ...stack
-      },
-      removeTabBar()
-    )
+    screen: createBottomTabNavigator({
+      map: MapScreen,
+      deck: DeckScreen,
+      ...stack
+    })
   }
 };
 

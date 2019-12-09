@@ -1,17 +1,34 @@
 import React, { useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, AsyncStorage, StyleSheet } from "react-native";
 import { connect } from "react-redux";
 import * as actions from "../actions";
+import { centerItems } from "../src/styles/base";
 
-const AuthScreen = props => {
+const AuthScreen = ({ token, navigation, facebookLogin }) => {
   useEffect(() => {
-    props.facebookLogin();
-  });
+    const shouldNavigate = () => {
+      if (token) {
+        navigation.navigate("map");
+      }
+    };
+    facebookLogin();
+    shouldNavigate();
+  }, [token]);
+
   return (
-    <View>
+    <View style={styles.container}>
       <Text> AuthScreen </Text>
     </View>
   );
 };
 
-export default connect(null, actions)(AuthScreen);
+const mapStateToProps = ({ auth }) => {
+  return {
+    token: auth.token
+  };
+};
+
+const styles = StyleSheet.create({
+  ...centerItems()
+});
+export default connect(mapStateToProps, actions)(AuthScreen);
