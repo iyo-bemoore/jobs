@@ -16,6 +16,7 @@ export const facebookLogin = () => async dispatch => {
 };
 
 const doLoginWithFB = async dispatch => {
+  await Facebook.initializeAsync();
   let { type, token } = await Facebook.logInWithReadPermissionsAsync(
     FB_APP_ID,
     {
