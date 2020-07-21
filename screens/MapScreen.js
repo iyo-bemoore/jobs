@@ -1,61 +1,68 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { Component } from "react";
+import { View, Text, ActivityIndicator } from "react-native";
+import { Button } from "react-native-elements";
 import MapView from "react-native-maps";
 import { connect } from "react-redux";
 import * as actions from "../actions";
-import { width, height } from "../src/styles/base";
-import { Button } from "react-native-elements";
-const MapScreen = props => {
-  const [mapDetails, setMapDetails] = useState({
+
+class MapScreen extends Component {
+  state = {
+    mapLoaded: false,
     region: {
       longitude: -122,
       latitude: 37,
       longitudeDelta: 0.04,
       latitudeDelta: 0.09
     }
-  });
-  const changeRegion = region => {
-    setMapDetails(region);
-  };
-  const onSearchPress = () => {
-    props.fetchJobs(mapDetails.region);
   };
 
-  useEffect(() => {}, []);
+  onRegionChangeComplete = region => {
+    this.setState({ region });
+  };
+  componentDidMount() {
+    this.setState({ mapLoaded: true });
+  }
 
-  console.log("from screen", mapDetails.region);
-  return (
-    <View style={styles.mapContainer}>
-      <MapView
-        onRegionChangeComplete={changeRegion}
-        region={mapDetails.region}
-        style={styles.mapper}
-      />
-      <View style={styles.buttonContainer}>
-        <Button
-          large
-          title="Search This Area"
-          backGroundColor="#009688"
-          icon={{ name: "search" }}
-          onPress={onSearchPress}
+  onButtonPress = () => {
+    this.props.fetchJobs(this.state.region);
+  };
+
+  render() {
+    if (!this.state.mapLoaded) {
+      return (
+        <View style={{ flex: 1, justifyContent: "center" }}>
+          <ActivityIndicator size="large" color="orangered" />
+        </View>
+      );
+    }
+    return (
+      <View style={{ flex: 1 }}>
+        <MapView
+          region={this.state.region}
+          onRegionChangeComplete={this.onRegionChangeComplete}
+          style={{ flex: 1 }}
         />
+        <View style={styles.buttonContainer}>
+          <Button
+            large
+            title="Search this area"
+            backgroundColor="#009688"
+            icon={{ name: "search", color: "#FFF" }}
+            onPress={this.onButtonPress}
+          />
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  }
+}
 
-const styles = StyleSheet.create({
+const styles = {
   buttonContainer: {
     position: "absolute",
-    bottom: height / 14,
-    left: width / 2 - width / 5
-  },
-  mapContainer: {
-    flex: 1
-  },
-  mapper: {
-    flex: 1
+    bottom: 20,
+    left: 6,
+    right: 6
   }
-});
+};
 
 export default connect(null, actions)(MapScreen);
